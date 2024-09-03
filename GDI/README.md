@@ -188,6 +188,77 @@ Back to [main page](../).
 
 ![bezier_drawing](./assets/bezier_drawing.png)
 
+### Cetvrti termin laboratorijskih vezbi - Font
+
+#### Osnove - fontovi
+
+- Fontovi su GDI objekti koji definisu nacin ispisa teksta;
+- Termini:
+  - *glyph* - pojedinacni znak;
+  - *font* - kolekcija znakova sa istim dizajnom;
+  - *font family* - skup fontova koji dele isti osnovni dizajn;
+  - *typeface* - dizajn fonta;
+  - *pitch* - sirina pojedinacnog znaka;
+    - *fixed* - svi znaci iste sirine;
+    - *variable* - neki karakteri siri, neki uzi - varijabilna sirina;
+  - *serif* - crtice na krajevima karaktera;
+- Tipovi:
+  - *rasterski* - pomocu bitmapa;
+  - *vektorski* - definisani primitivama;
+  - *TrueType* - najfleksibilniji, sacinjeni od linija i krivih i dodatnih informacija o svakom znaku;
+  - *OpenType* - prosirenje *TrueType*-a tako da podrzava Adobe PostScript Compact fajl format;
+  - *ClearType* - Microsoft implementacija subpikselnog iscrtavanja fontova;
+- Familija fontova:
+  - *decorative* - novi, ukrasni fontovi;
+  - *dontcare* - genericki, informacija o familiji ne postoji ili je irelevantna;
+  - *modern* - fontovi sa fiksnom sirinom;
+  - *roman* - fontovi promenljive sirine;
+  - *script* - fontovi nalik pisanim slovima;
+  - *swiss* - fontovi promenljive sirine;
+
+- `CFont` - MFC klasa kopja omogucuje upravljanje ispisom teksta; ima samo podrazumevani konstruktor;
+- jedini nacin da se zadaju parametri je pozivom funkcije `CreateFont()` - ima 14 parametara, ali je uglavnom potrebno zadati prvi i zadnji parametar - *height* i *naziv* fonta;
+  - `CFont font; font.CreateFont(20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, _T("Times New Roman"));`
+
+- Funkcija za ispis teksta:
+  - `BOOL CDC::TextOut(int x, int y, const Cstring& str)`;
+  - `virtual BOOL CDC::TextOut(int x, int y, LPCTSTR lpszString, int nCount)`;
+
+- preskocen znacajan deo oko specijalnih podesavanja, rotacija, itd; procitaj ovo, necu da ga prepisujem;
+
+- stock fontovi:
+  - `ANSI_FIXED_FONT` - sistemski font fiksne sirine karaktera;
+  - `ANSI_VAR_FONT` - sistemski font promenljive sirine karaktera;
+  - `DEVICE_DEFAULT_FONT` - font zavistan od uredjaja;
+  - `DEFAULT_GUI_FONT` - podrazumevani font namenjen ispisu teksta na korisnickom interfejsu;
+  - `OEM_FIXED_FONT` - font fiksne sirine karaktera zavistan od OEM-a;
+  - `SYSTEM_FONT` - sistemski font;
+
+#### Metrike fontova
+
+##### Horizontalna
+
+![horizontal_font_metrics](./assets/horizontal_font_metrics.png)
+- `BOOL CDC::GetCharABCWidths(UINT nFirstChar, UINT nLastChar, LPABC lpabc)`;
+- `BOOL CDC::GetCharWidth(UINT nFirstChar, UINT nLastChar, LPABC lpBuffer)`;
+  - `lpBuffer` i `lpabc` moraju imati duzinu od barem *nLastChar - nFirstChar + 1*;
+
+##### Vertikalna
+
+![vertical_font_metrics](./assets/vertical_font_metrics.png)
+- `CSize CDC::GetTextExtent(const CString& str)` - racuna velicinu (sirinu i visinu) prosledjenog teksta ispisanog trenutno selektovanim fontom;
+
+#### Najbitnija slika - fontovi
+
+![most_important_for_fonts](./assets/most_important_for_fonts.png)
+
+## Labovi
+
+### Laboratorijska vezba 1 - Tangram
+
+- [Kod](./Tangram/Tangram/TangramView.cpp);
+![lab_1](./assets/lab_1.png)
+
 ## References
 
 - [Microsoft Learn - Windows GDI](https://learn.microsoft.com/en-us/windows/win32/gdi/windows-gdi);
