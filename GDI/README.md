@@ -2,7 +2,37 @@
 
 Back to [main page](../).
 
-## Vezbe
+## Labs
+
+### Laboratorijska vezba 1 - Tangram
+
+- Fokus vezbe - koriscenje grafickih objekata i iscrtavanje osnovnih grafickih primitiva; elementarni tekst i fontovi;
+
+- Kod:
+  - [Header](./Tangram/Tangram/TangramView.h)
+  - [Implementacije](./Tangram/Tangram/TangramView.cpp);
+
+Rezultat:
+
+![lab_1](./.assets/lab_1.png)
+
+### Laboratorijska vezba 2 - Cactus
+
+- Fokus vezbe - rad sa metafajlovima i svetske (globalne) transformacije; tekst i fontovi;
+
+- Kod:
+  - [Header](./Metafajlovi/Metafajlovi/MetafajloviView.h)
+  - [Implementacija](./Metafajlovi/Metafajlovi/MetafajloviView.cpp)
+
+Rezultat:
+
+![lab_2](./.assets/lab_2.png)
+
+### Laboratorijska vezba 3 - MonaPuzzle
+
+- Fokus vezbe - rad sa bitmapama i svetske (globalne) transformacije;
+
+## Racunske vezbe
 
 ### Prvi termin vezbi - 2D grafika primenom GDI
 
@@ -318,7 +348,21 @@ Back to [main page](../).
 - `BOOL CombineTransform(LPXFORM lpxformResult, const XFORM* lpxform1, const XFORM* lpxform2)`;
   - opisano pseudo-kodom - matrix_multiply(result, op_left, op_right);
 
-##### Funkcije `Translate`, `Rotate`, `Scale`
+### Sesti termin laboratorijskih vezbi - Metafajlovi
+
+- standardni (Windows) metafajlovi cuvaju se u datotekama sa ekstenzijom WMF, dok unapredjeni format ima ekstenziju EMF (Enhanced);
+
+#### Standardni metafajlovi - preskoceno
+
+#### Unapredjeni metafajlovi
+
+- kreiranje - preskoceno;
+
+- ucitavanje, kopiranje, crtanje i brisanje:
+  - `HENHMETAFILE GetEnhMetaFile(LPCTSTR lpszMetaFile)` - ucitavanje;
+  - `HENHMETAFILE CopyEnhMetaFile(HENHMETAFILE hmfSrc, LPCTSTR lpszFile)` - kopiranje;
+  - `BOOL CDC::PlayMetaFile(HENHMETAFILE hMF, LPCRECT lpBounds)` - crtanje na osnovu zadatog pravougaonika;
+  - `BOOL DeleteEnhMetaFile(HENHMETAFILE hMF)` - brisanje;
 
 ## Reusable kod
 
@@ -351,7 +395,7 @@ void CGenericProjectNameView::DrawGrid(CDC* pDC)
 
 - Koordinatne ose
 ```c++
-void CElementaryTransformationsView::DrawAxes(CDC* pDC)
+void CGenericProjectNameView::DrawAxes(CDC* pDC)
 {
 	CPen redPen{ PS_COSMETIC | PS_SOLID, 0, RGB(255, 0, 0) };
 	CPen greenPen{ PS_COSMETIC | PS_SOLID, 0, RGB(0, 255, 0) };
@@ -413,26 +457,6 @@ void CGenericProjectNameView::Scale(CDC* pDC, FLOAT Sx, FLOAT Sy, DWORD mode)
 	pDC->ModifyWorldTransform(&scalingMatrix, mode);
 }
 ```
-
-## Labovi
-
-### Laboratorijska vezba 1 - Tangram
-
-- Fokus vezbe - koriscenje grafickih objekata i iscrtavanje osnovnih grafickih primitiva; elementarni tekst i fontovi;
-
-- [Kod](./Tangram/Tangram/TangramView.cpp);
-
-Rezultat:
-
-![lab_1](./.assets/lab_1.png)
-
-### Laboratorijska vezba 2 - Cactus
-
-- Fokus vezbe - rad sa metafajlovima i svetske (globalne) transformacije; tekst i fontovi;
-
-### Laboratorijska vezba 3 - MonaPuzzle
-
-- Fokus vezbe - rad sa bitmapama i svetske (globalne) transformacije;
 
 ## References
 
