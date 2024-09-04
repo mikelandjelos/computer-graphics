@@ -95,7 +95,7 @@ Back to [main page](../).
 - mogu biti definisane i pomocu strukture `POINT` i `CPoint`;
 - crColor - boja na koju se postavlja piksel;
 
-![pixel_drawing](./assets/pixel_drawing.png)
+![pixel_drawing](./.assets/pixel_drawing.png)
 
 #### Crtanje linija i mnogouglova
 
@@ -106,7 +106,7 @@ Back to [main page](../).
 - `CPoint CDC::LineTo(int x, int y)`;
 - `CPoint CDC::LineTo(POINT point)`;
 
-![line_drawing](./assets/line_drawing.png)
+![line_drawing](./.assets/line_drawing.png)
 
 ##### Crtanje poligonalne linije
 
@@ -116,14 +116,14 @@ Back to [main page](../).
   - `lpPolyPoints` - niz brojeva, gde je svaki element broj tacaka jedne izlomljene;
   - `nCount` - broj izlomljenih linija (najmanje 2);
 
-![polygonal_line_drawing](./assets/polygonal_line_drawing.png)
+![polygonal_line_drawing](./.assets/polygonal_line_drawing.png)
 
 ##### Crtanje mnogougla
 
 - `BOOL CDC::Polygon(LPPOINT lpPoints, int nCount)` - crtanje jednog poligona;
 - `BOOL CDC::PolyPolygon(const POINT *lpPoints, const DWORD *lpPolyPoints, int nCount)` - crtanje niza mnogouglova;
 
-![polygon_drawing](./assets/polygon_drawing.png)
+![polygon_drawing](./.assets/polygon_drawing.png)
 
 #### Crtanje pravougaonika i elipsi
 
@@ -134,7 +134,7 @@ Back to [main page](../).
   - (x2, y2) (ili right, bottom) formiraju donje desno teme;
 - `BOOL CDC::Rectangle(LPCRECT lpRect)` - crtanje prosledjivanjem objekta tipa `CRect`;
 
-![rectangle_drawing](./assets/rectangle_drawing.png)
+![rectangle_drawing](./.assets/rectangle_drawing.png)
 
 ##### Crtanje elipsi (paralelne koordinatnim osama)
 
@@ -144,7 +144,7 @@ Back to [main page](../).
   - (x2, y2) (ili right, bottom) formiraju donje desno teme;
 - `BOOL CDC::Ellipse(LPCRECT lpRect)` - crtanje prosledjivanjem objekta tipa `CRect`;
 
-![ellipse_drawing](./assets/ellipse_drawing.png)
+![ellipse_drawing](./.assets/ellipse_drawing.png)
 
 ##### Crtanje zaobljenog pravougaonika (paralelnog koordinatnim osama)
 
@@ -152,7 +152,7 @@ Back to [main page](../).
   - `BOOL CDC::RoundRect(int x1, int y1, int x2, int y2, int x3, int y3)`;
   - `BOOL CDC::RoundRect(LPCRECT lpRect, POINT point)`;
 
-![round_rect_drawing](./assets/round_rect_drawing.png)
+![round_rect_drawing](./.assets/round_rect_drawing.png)
 
 #### Crtanje lukova i lucnih oblika
 
@@ -161,7 +161,7 @@ Back to [main page](../).
 - `BOOL CDC::Arc(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)`;
 - `BOOL CDC::Arc(LPCRECT lpRect, POINT ptStart, POINT ptEnd)`;
 
-![arc_drawing](./assets/arc_drawing.png)
+![arc_drawing](./.assets/arc_drawing.png)
 
 - Takodje, moze se podesavati orijentacija luka:
   - `int CDC::GetArcDirection()`;
@@ -173,20 +173,20 @@ Back to [main page](../).
 - `BOOL CDC::Pie(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)`;
 - `BOOL CDC::Pie(LPCRECT lpRect, POINT ptStart, POINT ptEnd)`;
 
-![pie_drawing](./assets/pie_drawing.png)
+![pie_drawing](./.assets/pie_drawing.png)
 
 ##### Crtanje odsecka
 
 - `BOOL CDC::Chord(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4 )`;
 - `BOOL CDC::Chord(LPCRECT lpRect, POINT ptStart, POINT ptEnd)`;
 
-![chord_drawing](./assets/chord_drawing.png)
+![chord_drawing](./.assets/chord_drawing.png)
 
 #### Crtanje Bezier-ove krive
 
 - Crtanje krive linije definisane Bezier-ovom krivom - `BOOL CDC::PolyBezier(const POINT* lpPoints, int nCount)`;
 
-![bezier_drawing](./assets/bezier_drawing.png)
+![bezier_drawing](./.assets/bezier_drawing.png)
 
 ### Cetvrti termin laboratorijskih vezbi - Font
 
@@ -238,27 +238,203 @@ Back to [main page](../).
 
 ##### Horizontalna
 
-![horizontal_font_metrics](./assets/horizontal_font_metrics.png)
+![horizontal_font_metrics](./.assets/horizontal_font_metrics.png)
 - `BOOL CDC::GetCharABCWidths(UINT nFirstChar, UINT nLastChar, LPABC lpabc)`;
 - `BOOL CDC::GetCharWidth(UINT nFirstChar, UINT nLastChar, LPABC lpBuffer)`;
   - `lpBuffer` i `lpabc` moraju imati duzinu od barem *nLastChar - nFirstChar + 1*;
 
 ##### Vertikalna
 
-![vertical_font_metrics](./assets/vertical_font_metrics.png)
+![vertical_font_metrics](./.assets/vertical_font_metrics.png)
 - `CSize CDC::GetTextExtent(const CString& str)` - racuna velicinu (sirinu i visinu) prosledjenog teksta ispisanog trenutno selektovanim fontom;
 
 #### Najbitnija slika - fontovi
 
-![most_important_for_fonts](./assets/most_important_for_fonts.png)
+![most_important_for_fonts](./.assets/most_important_for_fonts.png)
+
+### Peti termin laboratorijskih vezbi - koordinatni prostori i 2D transformacije
+
+- ravan u kojoj se koristi Dekartov koordinatni sistem;
+- postoje 4 koordinatna prostora:
+  - *world*;
+  - *page*;
+  - *device*;
+  - *physical device*;
+- transformacija je algoritam po kome se menja velicina, orijentacija, polozaj i/ili oblik objekata;
+
+![transformations_and_spaces](./.assets/transformations_and_spaces.png)
+
+- ovaj deo je bitan:
+
+![world_transformations](./.assets/world_transformations.png)
+
+- preslikavanje lokalnih u svetske koordinate - omogucuje transformacije - translacija, skaliranje, rotacija, smicanje, refleksija;
+
+#### Modovi mapiranja
+
+- `MM_TEXT` - default mod, 1 logicka jedinica se mapira na jedan piksel;
+- `MM_ISOTROPIC` - logicke jedinice mapiraju se u proizvoljne fizicke, ali sa ogranicenjem da je jednako skaliranje po obe ose;
+- `MM_ANISOTROPIC` - logicke jedinice mapiraju se u proizvoljne fizicke;
+
+- Funkcije preslikavanja:
+  - `int CDC::GetMapMode()` i `int CDC::SetMapMode(int fnMapMode)`;
+  - `BOOL CDC::SetWindowExt(int nXExtentW, int nYExtentW)` i `BOOL CDC::SetViewportExt(int nXExtentV, int nYExtentV)`;
+
+
+- Funkcije postavljanja koordinatnog pocetka:
+  - `BOOL CDC::SetWindowOrg(int X, int Y)` i `BOOL CDC::SetViewportOrg(int X, int Y)`;
+
+#### Geometrijske Transformacije
+
+- preslikavanje svetskog u prostor stranice;
+- elementarne 2D transformacije:
+
+![elementary_transformations](./.assets/elementary_transformations.png)
+
+![translation](./.assets/translation.png)
+
+![scaling](./.assets/scaling.png)
+
+![rotation](./..assets/rotation.png)
+
+![shear](./.assets/shear.png)
+
+![reflection](./.assets/reflection.png)
+
+- `XFORM` struktura - definise matricu transformacije na sledeci nacin:
+
+![x_form](./.assets/x_form.png)
+
+![x_form_table](./.assets/x_form_table.png)
+
+- `BOOL CDC::SetWorldTransform(const XFORM *lpXform)` - transformacija;
+- pre funkcije iznad, treba se pozvati `int CDC::SetGraphicsMode(int iMode)` i `GM_ADVANCED`;
+
+- metod za izmenu trenutne transformacije DC-a - `BOOL CDC::ModifyWorldTransform(const XFORM* lpXform, DWORD iMode)`;
+  - `iMode` moze biti `WMT_IDENTITY`, `MWT_LEFTMULTIPLY` i `MWT_RIGHTMULTIPLY`;
+
+- pogledi posmatranja - ima ih 2, *globalni* i *lokalni* - procitaj;
+
+- `BOOL CombineTransform(LPXFORM lpxformResult, const XFORM* lpxform1, const XFORM* lpxform2)`;
+  - opisano pseudo-kodom - matrix_multiply(result, op_left, op_right);
+
+##### Funkcije `Translate`, `Rotate`, `Scale`
+
+## Reusable kod
+
+### Miscellaneous
+
+- Grid
+```c++
+void CGenericProjectNameView::DrawGrid(CDC* pDC)
+{
+	CRect rcClient;
+	GetClientRect(&rcClient);
+
+	for (int cursor = gridUnitSize; cursor < rcClient.Width(); cursor += gridUnitSize)
+		pDC->MoveTo(cursor, 0), pDC->LineTo(cursor, rcClient.Height());
+
+	for (int cursor = gridUnitSize; cursor < rcClient.Height(); cursor += gridUnitSize)
+		pDC->MoveTo(0, cursor), pDC->LineTo(rcClient.Width(), cursor);
+
+	TCHAR gridSizeTextString[32];
+	wsprintf(gridSizeTextString, _T("%dx%d"), widthInGridUnits, heightInGridUnits);
+	CString gridSizeText(gridSizeTextString);
+
+	CPoint gridSizeTextExtent = pDC->GetTextExtent(gridSizeText);
+
+	int oldBkMode = pDC->SetBkMode(TRANSPARENT);
+	pDC->TextOutW(windowWidth - gridSizeTextExtent.x - 5, windowHeight - gridSizeTextExtent.y - 5, gridSizeText);
+	pDC->SetBkMode(oldBkMode);
+}
+```
+
+- Koordinatne ose
+```c++
+void CElementaryTransformationsView::DrawAxes(CDC* pDC)
+{
+	CPen redPen{ PS_COSMETIC | PS_SOLID, 0, RGB(255, 0, 0) };
+	CPen greenPen{ PS_COSMETIC | PS_SOLID, 0, RGB(0, 255, 0) };
+
+	// x axis
+	CPen* oldPen = pDC->SelectObject(&greenPen);
+	pDC->MoveTo(0, 0);
+	pDC->LineTo(100, 0);
+
+	// y axis
+	pDC->SelectObject(&redPen);
+	pDC->MoveTo(0, 0);
+	pDC->LineTo(0, 100);
+
+	pDC->SelectObject(oldPen);
+
+	redPen.DeleteObject();
+	greenPen.DeleteObject();
+}
+```
+
+### Transformacije
+
+- Translacija
+```c++
+void CGenericProjectNameView::Translate(CDC* pDC, FLOAT Dx, FLOAT Dy, DWORD mode)
+{
+	const XFORM translationMatrix{
+		1.f, 0.f,
+		0.f, 1.f,
+		Dx, Dy,
+	};
+	pDC->ModifyWorldTransform(&translationMatrix, mode);
+}
+```
+
+- Rotacija
+```c++
+void CGenericProjectNameView::Rotate(CDC* pDC, FLOAT angle, DWORD mode)
+{
+	const XFORM rotationMatrix{
+		cosf(angle), sinf(angle),
+		-sinf(angle), cosf(angle),
+		0.f, 0.f,
+	};
+	pDC->ModifyWorldTransform(&rotationMatrix, mode);
+}
+```
+
+- Skaliranje
+```c++
+void CGenericProjectNameView::Scale(CDC* pDC, FLOAT Sx, FLOAT Sy, DWORD mode)
+{
+	const XFORM scalingMatrix{
+		Sx, 0.f,
+		0.f, Sy,
+		0.f, 0.f,
+	};
+	pDC->ModifyWorldTransform(&scalingMatrix, mode);
+}
+```
 
 ## Labovi
 
 ### Laboratorijska vezba 1 - Tangram
 
+- Fokus vezbe - koriscenje grafickih objekata i iscrtavanje osnovnih grafickih primitiva; elementarni tekst i fontovi;
+
 - [Kod](./Tangram/Tangram/TangramView.cpp);
-![lab_1](./assets/lab_1.png)
+
+Rezultat:
+
+![lab_1](./.assets/lab_1.png)
+
+### Laboratorijska vezba 2 - Cactus
+
+- Fokus vezbe - rad sa metafajlovima i svetske (globalne) transformacije; tekst i fontovi;
+
+### Laboratorijska vezba 3 - MonaPuzzle
+
+- Fokus vezbe - rad sa bitmapama i svetske (globalne) transformacije;
 
 ## References
 
+- Stranica predmeta - CS;
 - [Microsoft Learn - Windows GDI](https://learn.microsoft.com/en-us/windows/win32/gdi/windows-gdi);
