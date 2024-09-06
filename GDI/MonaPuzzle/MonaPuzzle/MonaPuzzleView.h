@@ -18,6 +18,8 @@ protected: // create from serialization only
 	const int gridUnitSize = 500 / 20;
 	BOOL gridActive = FALSE;
 
+	CPoint center{ 0, 0 };
+
 	int windowWidth = -1, windowHeight = -1;
 public:
 	CMonaPuzzleDoc* GetDocument() const;
@@ -43,9 +45,14 @@ protected:
 	virtual void Rotate(CDC* pDC, FLOAT angleInRadians, DWORD mode = MWT_LEFTMULTIPLY);
 	virtual void Mirror(CDC* pDC, BOOL Mx, BOOL My, DWORD mode = MWT_LEFTMULTIPLY);
 
-	virtual void DrawTransparent(CDC* pDC, DImage& image, int x = 0, int y = 0);
+	virtual void AntiFlicker(CDC* pDC);
 
-	virtual void DrawMonaPuzzle(CDC* pDC);
+	virtual void CopyBitmap(CDC* pDC, CBitmap* dstBmp, CBitmap* srcBmp);
+	virtual void DrawPuzzle(CDC* pDC, DImage& image, int x = 0, int y = 0, BOOL blueFilter = FALSE);
+	virtual void ConvertToGreyscale(CBitmap* bitmap);
+	virtual void BlueFilter(CBitmap* bitmap);
+
+	virtual void AssembleMona(CDC* pDC);
 public:
 	virtual ~CMonaPuzzleView();
 #ifdef _DEBUG

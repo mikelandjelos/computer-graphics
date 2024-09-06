@@ -30,7 +30,16 @@ Rezultat:
 
 ### Laboratorijska vezba 3 - MonaPuzzle
 
-- Fokus vezbe - rad sa bitmapama i svetske (globalne) transformacije;
+- Fokus vezbe - rad sa bitmapama, (ucitavanje, iscrtavanje, transparencija, filtriranje);
+
+- Kod:
+  - [Header](./MonaPuzzle/MonaPuzzle/MonaPuzzleView.h)
+  - [Implementacija](./MonaPuzzle/MonaPuzzle/MonaPuzzleView.cpp)
+
+Rezultat:
+
+![lab_3](./.assets/lab_3.png)
+
 
 ## Reusable kod
 
@@ -134,6 +143,146 @@ void CGenericProjectNameView::Scale(CDC* pDC, FLOAT Sx, FLOAT Sy, DWORD mode)
 }
 ```
 
+- Inverzija (Mirror)
+```c++
+void CGenericProjectNameView::Mirror(CDC* pDC, BOOL Mx, BOOL My, DWORD mode)
+{
+	const XFORM matrix{
+		Mx ? -1.f : 1.f, 0.f,
+		0.f, My ? -1.f : 1.f,
+		0.f, 0.f,
+	};
+	pDC->ModifyWorldTransform(&matrix, mode);
+}
+```
+
+- Kopiranje bitmape
+```c++
+void CGenericProjectNameView::CopyBitmap(CDC* pDC, CBitmap* dstBmp, CBitmap* srcBmp)
+{
+	// Get bitmap information from the source bitmap
+	BITMAP bitmapInfo;
+	srcBmp->GetBitmap(&bitmapInfo);
+
+	// Create a memory device context (CDC) compatible with the screen
+	CDC sourceDC, destDC;
+	sourceDC.CreateCompatibleDC(pDC);  // Source DC
+	destDC.CreateCompatibleDC(pDC);    // Destination DC
+
+	// Select the source bitmap into the source device context
+	CBitmap* pOldSourceBitmap = sourceDC.SelectObject(srcBmp);
+
+	// Create a new destination bitmap with the same size as the source
+	dstBmp->CreateCompatibleBitmap(&sourceDC, bitmapInfo.bmWidth, bitmapInfo.bmHeight);
+
+	// Select the destination bitmap into the destination device context
+	CBitmap* pOldDestBitmap = destDC.SelectObject(dstBmp);
+
+	// Copy the source bitmap to the destination bitmap
+	destDC.BitBlt(0, 0, bitmapInfo.bmWidth, bitmapInfo.bmHeight, &sourceDC, 0, 0, SRCCOPY);
+
+	// Clean up: restore the old bitmaps and delete the device contexts
+	sourceDC.SelectObject(pOldSourceBitmap);
+	destDC.SelectObject(pOldDestBitmap);
+}
+```
+
+- Transparencija
+```c++
+void CGenericProjectNameView::DrawPuzzle(CDC* pDC, DImage& image, int x, int y, BOOL blueFilter)
+{
+	int bitmapWidth = image.Width(), bitmapHeight = image.Height();
+
+	CBitmap copy;
+	CopyBitmap(pDC, &copy, image.GetBitmap());
+
+	CBitmap mask;
+	mask.CreateBitmap(bitmapWidth, bitmapHeight, 1, 1, NULL);
+
+	// Part 1 - create DC that will contain source image (bitmap) - source DC,
+	// and a DC where we will create our filtering mask - destination DC.
+
+	CDC srcDC{};
+	srcDC.CreateCompatibleDC(pDC);
+	CDC dstDC{};
+	dstDC.CreateCompatibleDC(pDC);
+
+	CBitmap* oldSrcBitmap = srcDC.SelectObject(&copy);
+	CBitmap* dstOldBitmap = dstDC.SelectObject(&mask);
+
+	// Setting bk color for srcDC (this color will be filtered in the end).
+	COLORREF srcTopLeftPixel = srcDC.GetPixel(0, 0);
+	COLORREF oldSrcBkColor = srcDC.SetBkColor(srcTopLeftPixel);
+
+	// Mask formed - pixel takes value 0 if the corresponding pixel from srcDC is colored
+	// with the srcDC bk color, elsewhere 1 (the mask is kinda inverse, because default bk color is white).
+	dstDC.BitBlt(0, 0, bitmapWidth, bitmapHeight, &srcDC, 0, 0, SRCCOPY);
+
+	// Filtering takes place here. After this step, inside our source DC
+	// there will be a filtered version of our source image.
+	COLORREF oldSrcTextColor = srcDC.SetTextColor(RGB(255, 255, 255));
+	srcDC.SetBkColor(RGB(0, 0, 0));
+	srcDC.BitBlt(0, 0, bitmapWidth, bitmapHeight, &dstDC, 0, 0, SRCAND);
+
+	// Final drawing to pDC - mask and then picture 'over' it.
+	pDC->BitBlt(x, y, bitmapWidth, bitmapHeight, &dstDC, 0, 0, SRCAND);
+	pDC->BitBlt(x, y, bitmapWidth, bitmapHeight, &srcDC, 0, 0, SRCPAINT);
+
+	// Releasing resources.
+	dstDC.SelectObject(dstOldBitmap);
+	dstDC.DeleteDC();
+	srcDC.SelectObject(oldSrcBitmap);
+	srcDC.DeleteDC();
+}
+```
+
+- BGRA (32bit svaki piksel) to GRAYSCALE
+```c++
+void CGenericProjectNameView::BGRA2Greyscale(CBitmap* bitmap)
+{
+	BITMAP bitmapInfo;
+	bitmap->GetBitmap(&bitmapInfo);
+
+  if (bitmapInfo.bmBitsPixel != 32)
+  {
+    AfxMessageBox(L"Not a BGRA image!");
+    exit(-1);
+  }
+
+  // Should be colorsPerPixel == 4.
+	int colorsPerPixel = bitmapInfo.bmBitsPixel / CHAR_BIT; // CHAR_BIT == number of bits in a byte, i.e. 8.
+	long bmpSize = bitmapInfo.bmWidth * bitmapInfo.bmHeight * colorsPerPixel;
+
+	BYTE* lpBits = new BYTE[bmpSize];
+	bitmap->GetBitmapBits(bmpSize, lpBits);
+
+	int threshold = 30;
+	BYTE transparencyMask[3]{ lpBits[0], lpBits[1], lpBits[2], };
+
+	for (long i = 0; i < bmpSize; i += colorsPerPixel)
+	{
+		BYTE b = lpBits[i];
+		BYTE g = lpBits[i + 1];
+		BYTE r = lpBits[i + 2];
+
+		if (transparencyMask[0] == r &&
+			transparencyMask[1] == g &&
+			transparencyMask[2] == b)
+			continue;
+
+		BYTE gray = threshold + (b + g + r) / 3;
+
+		if (gray > threshold) {
+			lpBits[i] = gray;
+			lpBits[i + 1] = gray;
+			lpBits[i + 2] = gray;
+		}
+	}
+
+	bitmap->SetBitmapBits(bmpSize, lpBits);
+	delete[] lpBits;
+}
+```
 
 ## Racunske vezbe
 
@@ -488,19 +637,7 @@ img.Load(L"Path\\To\\Bitmap\\Image.bmp");
 img.Draw(pDC, CRect{ 0, 0, img.Width(), img.Width() }, CRect{ 0, 0, img.Width(), img.Height() });
 ```
 
-#### DDBs
-
-- klasa `CBitmap` sa metodama `LoadBitmap`, `CreateBitmap`, `CreateCompatibleBitmap`, ...;
-  - jos korisnih metoda - `GetBitmap`, `SetBitmapBits`, `GetBitmapBits`, ...;
-- `BITMAP` struktura;
-
-- Selekcija bitmape - `CBitmap* SelectObject(CBitmap*)`;
-- `BOOL CDC::BitBlt(int x, int y, int nWidth, int nHeight, CDC* pSrcDC, int xSrc, int ySrc, DWORD dwRop)` - kopiranje bitmape iz izvornog u odredisni kontekst uredjaja;
-  - pomocu ovoga mozemo da implementiramo **transparenciju**;
-
-#### DIBs
-
-
+### Osmi termin vezbi - 
 
 ## References
 
