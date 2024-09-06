@@ -45,7 +45,7 @@ Rezultat:
 
 ### Miscellaneous
 
-- Konverzija iz stepeni u radijane
+- Konverzija stepena u radijane
 ```c++
 #define _USE_MATH_DEFINES
 #include "math.h"
