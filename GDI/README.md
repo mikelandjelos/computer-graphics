@@ -10,7 +10,7 @@ Back to [main page](../).
 
 - Kod:
   - [Header](./Tangram/Tangram/TangramView.h)
-  - [Implementacije](./Tangram/Tangram/TangramView.cpp);
+  - [Implementacije](./Tangram/Tangram/TangramView.cpp)
 
 Rezultat:
 
@@ -31,6 +31,109 @@ Rezultat:
 ### Laboratorijska vezba 3 - MonaPuzzle
 
 - Fokus vezbe - rad sa bitmapama i svetske (globalne) transformacije;
+
+## Reusable kod
+
+### Miscellaneous
+
+- Konverzija iz stepeni u radijane
+```c++
+#define _USE_MATH_DEFINES
+#include "math.h"
+
+#define DEG2RAD(x) ((2. * M_PI * x) / 360.)
+```
+
+- Grid
+```c++
+void CGenericProjectNameView::DrawGrid(CDC* pDC)
+{
+	CRect rcClient;
+	GetClientRect(&rcClient);
+
+	for (int cursor = gridUnitSize; cursor < rcClient.Width(); cursor += gridUnitSize)
+		pDC->MoveTo(cursor, 0), pDC->LineTo(cursor, rcClient.Height());
+
+	for (int cursor = gridUnitSize; cursor < rcClient.Height(); cursor += gridUnitSize)
+		pDC->MoveTo(0, cursor), pDC->LineTo(rcClient.Width(), cursor);
+
+	TCHAR gridSizeTextString[32];
+	wsprintf(gridSizeTextString, _T("%dx%d"), widthInGridUnits, heightInGridUnits);
+	CString gridSizeText(gridSizeTextString);
+
+	CPoint gridSizeTextExtent = pDC->GetTextExtent(gridSizeText);
+
+	int oldBkMode = pDC->SetBkMode(TRANSPARENT);
+	pDC->TextOutW(windowWidth - gridSizeTextExtent.x - 5, windowHeight - gridSizeTextExtent.y - 5, gridSizeText);
+	pDC->SetBkMode(oldBkMode);
+}
+```
+
+- Koordinatne ose
+```c++
+void CGenericProjectNameView::DrawAxes(CDC* pDC)
+{
+	CPen redPen{ PS_COSMETIC | PS_SOLID, 0, RGB(255, 0, 0) };
+	CPen greenPen{ PS_COSMETIC | PS_SOLID, 0, RGB(0, 255, 0) };
+
+	// x axis
+	CPen* oldPen = pDC->SelectObject(&greenPen);
+	pDC->MoveTo(0, 0);
+	pDC->LineTo(100, 0);
+
+	// y axis
+	pDC->SelectObject(&redPen);
+	pDC->MoveTo(0, 0);
+	pDC->LineTo(0, 100);
+
+	pDC->SelectObject(oldPen);
+
+	redPen.DeleteObject();
+	greenPen.DeleteObject();
+}
+```
+
+### Transformacije
+
+- Translacija
+```c++
+void CGenericProjectNameView::Translate(CDC* pDC, FLOAT Dx, FLOAT Dy, DWORD mode)
+{
+	const XFORM translationMatrix{
+		1.f, 0.f,
+		0.f, 1.f,
+		Dx, Dy,
+	};
+	pDC->ModifyWorldTransform(&translationMatrix, mode);
+}
+```
+
+- Rotacija
+```c++
+void CGenericProjectNameView::Rotate(CDC* pDC, FLOAT angle, DWORD mode)
+{
+	const XFORM rotationMatrix{
+		cosf(angle), sinf(angle),
+		-sinf(angle), cosf(angle),
+		0.f, 0.f,
+	};
+	pDC->ModifyWorldTransform(&rotationMatrix, mode);
+}
+```
+
+- Skaliranje
+```c++
+void CGenericProjectNameView::Scale(CDC* pDC, FLOAT Sx, FLOAT Sy, DWORD mode)
+{
+	const XFORM scalingMatrix{
+		Sx, 0.f,
+		0.f, Sy,
+		0.f, 0.f,
+	};
+	pDC->ModifyWorldTransform(&scalingMatrix, mode);
+}
+```
+
 
 ## Racunske vezbe
 
@@ -218,7 +321,7 @@ Rezultat:
 
 ![bezier_drawing](./.assets/bezier_drawing.png)
 
-### Cetvrti termin laboratorijskih vezbi - Font
+### Cetvrti termin vezbi - Font
 
 #### Osnove - fontovi
 
@@ -282,7 +385,7 @@ Rezultat:
 
 ![most_important_for_fonts](./.assets/most_important_for_fonts.png)
 
-### Peti termin laboratorijskih vezbi - koordinatni prostori i 2D transformacije
+### Peti termin vezbi - koordinatni prostori i 2D transformacije
 
 - ravan u kojoj se koristi Dekartov koordinatni sistem;
 - postoje 4 koordinatna prostora:
@@ -348,7 +451,7 @@ Rezultat:
 - `BOOL CombineTransform(LPXFORM lpxformResult, const XFORM* lpxform1, const XFORM* lpxform2)`;
   - opisano pseudo-kodom - matrix_multiply(result, op_left, op_right);
 
-### Sesti termin laboratorijskih vezbi - Metafajlovi
+### Sesti termin vezbi - Metafajlovi
 
 - standardni (Windows) metafajlovi cuvaju se u datotekama sa ekstenzijom WMF, dok unapredjeni format ima ekstenziju EMF (Enhanced);
 
@@ -364,99 +467,40 @@ Rezultat:
   - `BOOL CDC::PlayMetaFile(HENHMETAFILE hMF, LPCRECT lpBounds)` - crtanje na osnovu zadatog pravougaonika;
   - `BOOL DeleteEnhMetaFile(HENHMETAFILE hMF)` - brisanje;
 
-## Reusable kod
+### Sedmi termin vezbi - Bitmape
 
-### Miscellaneous
+- Obrati paznju - **transparencija**, **filtriranje**, pomocna biblioteka `DImage`;
 
-- Grid
+- Treba da znas kako se ucitava slika - pomocu `DImage` klase;
+- Treba da znas kako se iscrtava slika - takodje pomocu `DImage` klase;
+- Iscrtavanje bitmape u njenoj prirodnoj velicini;
+- Rasterske operacije - `SRCAND`, `SRCCOPY`, `SRCPAINT`;
+
+- `CBitmap::CreateCompatibleBitmap(CDC* pDC, int nWidth, int nHeight)` - inicijalizacija objekta sa bitmapom tako da je kompatibilan sa navedenim uredjajem;
+- `CBitmap::CreateBitmap(int nWidth, int nHeight, UINT nPlanes, UINT nBitcount, const void* lpBits)` - inicijalizacija objekta sa bitmapom iz memorije zavisnom od uredjaja, koja ima navedenu sirinu, visinu i niz bitova;
+- `DWORD CBitmap::SetBitmapBits(DWORD dwCount, const void* lpBits)` - postavljanje niza bitova bitmape na navedene vrednosti;
+- `DWORD CBitmap::GetBitmapBits(DWORD dwCount, LPVOID lpBits) const` - postavljanje niza bitova bitmape na navedene vrednosti;
+- `BOOL CDC::BitBlt(int x, int y, int nWidth, int nHeight, CDC* pSrcDC, int xSrc, int ySrc, DWORD dwRop)` - 
+
 ```c++
-void CGenericProjectNameView::DrawGrid(CDC* pDC)
-{
-	CRect rcClient;
-	GetClientRect(&rcClient);
-
-	for (int cursor = gridUnitSize; cursor < rcClient.Width(); cursor += gridUnitSize)
-		pDC->MoveTo(cursor, 0), pDC->LineTo(cursor, rcClient.Height());
-
-	for (int cursor = gridUnitSize; cursor < rcClient.Height(); cursor += gridUnitSize)
-		pDC->MoveTo(0, cursor), pDC->LineTo(rcClient.Width(), cursor);
-
-	TCHAR gridSizeTextString[32];
-	wsprintf(gridSizeTextString, _T("%dx%d"), widthInGridUnits, heightInGridUnits);
-	CString gridSizeText(gridSizeTextString);
-
-	CPoint gridSizeTextExtent = pDC->GetTextExtent(gridSizeText);
-
-	int oldBkMode = pDC->SetBkMode(TRANSPARENT);
-	pDC->TextOutW(windowWidth - gridSizeTextExtent.x - 5, windowHeight - gridSizeTextExtent.y - 5, gridSizeText);
-	pDC->SetBkMode(oldBkMode);
-}
+DImage img;
+img.Load(L"Path\\To\\Bitmap\\Image.bmp");
+img.Draw(pDC, CRect{ 0, 0, img.Width(), img.Width() }, CRect{ 0, 0, img.Width(), img.Height() });
 ```
 
-- Koordinatne ose
-```c++
-void CGenericProjectNameView::DrawAxes(CDC* pDC)
-{
-	CPen redPen{ PS_COSMETIC | PS_SOLID, 0, RGB(255, 0, 0) };
-	CPen greenPen{ PS_COSMETIC | PS_SOLID, 0, RGB(0, 255, 0) };
+#### DDBs
 
-	// x axis
-	CPen* oldPen = pDC->SelectObject(&greenPen);
-	pDC->MoveTo(0, 0);
-	pDC->LineTo(100, 0);
+- klasa `CBitmap` sa metodama `LoadBitmap`, `CreateBitmap`, `CreateCompatibleBitmap`, ...;
+  - jos korisnih metoda - `GetBitmap`, `SetBitmapBits`, `GetBitmapBits`, ...;
+- `BITMAP` struktura;
 
-	// y axis
-	pDC->SelectObject(&redPen);
-	pDC->MoveTo(0, 0);
-	pDC->LineTo(0, 100);
+- Selekcija bitmape - `CBitmap* SelectObject(CBitmap*)`;
+- `BOOL CDC::BitBlt(int x, int y, int nWidth, int nHeight, CDC* pSrcDC, int xSrc, int ySrc, DWORD dwRop)` - kopiranje bitmape iz izvornog u odredisni kontekst uredjaja;
+  - pomocu ovoga mozemo da implementiramo **transparenciju**;
 
-	pDC->SelectObject(oldPen);
+#### DIBs
 
-	redPen.DeleteObject();
-	greenPen.DeleteObject();
-}
-```
 
-### Transformacije
-
-- Translacija
-```c++
-void CGenericProjectNameView::Translate(CDC* pDC, FLOAT Dx, FLOAT Dy, DWORD mode)
-{
-	const XFORM translationMatrix{
-		1.f, 0.f,
-		0.f, 1.f,
-		Dx, Dy,
-	};
-	pDC->ModifyWorldTransform(&translationMatrix, mode);
-}
-```
-
-- Rotacija
-```c++
-void CGenericProjectNameView::Rotate(CDC* pDC, FLOAT angle, DWORD mode)
-{
-	const XFORM rotationMatrix{
-		cosf(angle), sinf(angle),
-		-sinf(angle), cosf(angle),
-		0.f, 0.f,
-	};
-	pDC->ModifyWorldTransform(&rotationMatrix, mode);
-}
-```
-
-- Skaliranje
-```c++
-void CGenericProjectNameView::Scale(CDC* pDC, FLOAT Sx, FLOAT Sy, DWORD mode)
-{
-	const XFORM scalingMatrix{
-		Sx, 0.f,
-		0.f, Sy,
-		0.f, 0.f,
-	};
-	pDC->ModifyWorldTransform(&scalingMatrix, mode);
-}
-```
 
 ## References
 
