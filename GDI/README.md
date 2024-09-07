@@ -43,15 +43,9 @@ Rezultat:
 
 ## Reusable kod
 
+- U odeljku `Reusable kod` mogu se naci neke olaksice i mini algoritmi za implementaciju osnovnih koncepata obradjenih u okviru GDI-a. 
+
 ### Miscellaneous
-
-- Konverzija stepena u radijane
-```c++
-#define _USE_MATH_DEFINES
-#include "math.h"
-
-#define DEG2RAD(x) ((2. * M_PI * x) / 360.)
-```
 
 - Grid
 ```c++
@@ -100,6 +94,14 @@ void CGenericProjectNameView::DrawAxes(CDC* pDC)
 	redPen.DeleteObject();
 	greenPen.DeleteObject();
 }
+```
+
+- Konverzija stepena u radijane
+```c++
+#define _USE_MATH_DEFINES
+#include "math.h"
+
+#define DEG2RAD(x) ((2. * M_PI * x) / 360.)
 ```
 
 ### Transformacije
@@ -156,6 +158,8 @@ void CGenericProjectNameView::Mirror(CDC* pDC, BOOL Mx, BOOL My, DWORD mode)
 }
 ```
 
+### Bitmape
+
 - Kopiranje bitmape
 ```c++
 void CGenericProjectNameView::CopyBitmap(CDC* pDC, CBitmap* dstBmp, CBitmap* srcBmp)
@@ -189,7 +193,7 @@ void CGenericProjectNameView::CopyBitmap(CDC* pDC, CBitmap* dstBmp, CBitmap* src
 
 - Transparencija
 ```c++
-void CGenericProjectNameView::DrawPuzzle(CDC* pDC, DImage& image, int x, int y, BOOL blueFilter)
+void CGenericProjectNameView::DrawImageTransparent(CDC* pDC, DImage& image, int x, int y, BOOL blueFilter)
 {
 	int bitmapWidth = image.Width(), bitmapHeight = image.Height();
 
@@ -637,7 +641,63 @@ img.Load(L"Path\\To\\Bitmap\\Image.bmp");
 img.Draw(pDC, CRect{ 0, 0, img.Width(), img.Width() }, CRect{ 0, 0, img.Width(), img.Height() });
 ```
 
-### Osmi termin vezbi - 
+### Osmi termin vezbi - Regioni, FloodFill, putanje
+
+#### Regioni
+
+- region je pravougaonik, mnogougao, elipsa ili kombinacija ovih figura i definise deo klijentske povrsine prozora koju je moguce obojiti, invertovati, ispuniti, uokviriti ili iskoristiti za detekciju pozicije kursora (hit test);
+- tipovi regiona su:
+  - pravougaoni,
+  - elipticni,
+  - poligonalni,
+  - kombinovani;
+
+- MFC klasa `CRgn`:
+  - `BOOL CreateRectRgn(int x1, int y1, int x2, int y2)`;
+  - `BOOL CreateEllipticRgn(int x1, int y1, int x2, int y2)`;
+  - `BOOL CreatePolygonRgn(LPPOINT lpPoints, int nCount, int nMode)`;
+  - `int CRgn::CopyRgn(CRgn* pRgnSrc)`;
+  - `int CRgn::OffsetRgn(int x, int y)`;
+  - `int CRgn::CombineRgn(CRgn* pRgn1, CRgn* pRgn2, int nCombineMode)`
+    - `RGN_AND`, `RGN_COPY`, `RGN_DIFF`, `RGN_OR`, `RGN_XOR`;
+  - `BOOL CRgn::PtInRegion(int x, int y) const`;
+  - `BOOL CRgn::RectInRegion(LPCRECT lpRect) const`;
+
+![combine_rgn](./.assets/combine_rgn.png)
+
+- Ispuna mnogougla - **Alternate** i **Winding** modovi;
+
+![filling_modes](./.assets/filling_modes.png)
+
+![alternate_mode](./.assets/alternate_mode.png)
+
+![winding_mode](./.assets/winding_mode.png)
+
+- `BOOL CDC::FillRgn(CRgn* pRgn, CBrush* pBrush)` - popunjavanje regiona;
+- `BOOL CDC::FrameRgn(CRgn* pRgn, CBrush* pBrush, int width, int height)` - iscrtavanje/popunjavanje okvira regiona;
+- `virtual int CDC::SelectClipRgn(CRgn* pRgn)`;
+- `int CDC::SelectClipRgn(CRgn* pRgn, int nMode)`;
+
+> [!warning] Region i transformacije
+> Izbegavati koriscenje svetskih transformacija sa regionima.
+> - svetske transformacije **uticu** na **iscrtavanje** regiona;
+> - svetske transformacije **ne uticu** na njihovo **formiranje** i **kombinovanje**
+> - prilikom testiranja **pripadnosti tacke** regionu, kao i prilikom **odsecanja**, svetske transformacije **ne funkcionisu**;
+
+#### Ispuna plavljenjem
+
+- `BOOL CDC::FloodFill(int x, int y, COLORREF crColor)` - funkcija ispunjava oblast tekucom cetkom, pocev od tacke cije su koordinate prosledjene, sve dok se ne naidje na piksele cija je boja `crColor`;
+
+#### Putanje
+
+- Putanju cine jedna ili vise figura koje mogu biti ispunjene, uokvirene ili oba;
+- `BOOL CDC::BeginPath()` - pocetak, odbacivanje prethodne putanje;
+- `BOOL CDC::EndPath()` - zavrsetak, selektovanje putanje;
+- `BOOL CDC::StrokePath()` - uokviravanje;
+- `BOOL CDC::FillPath()` - ispuna;
+- `BOOL CDC::StrokeAndFillPath()` - oba;
+
+- Napomena - svetske transformacije **ne uticu** na **iscrtavanje** putanje;
 
 ## References
 
