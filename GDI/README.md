@@ -101,7 +101,7 @@ void CGenericProjectNameView::DrawAxes(CDC* pDC)
 #define _USE_MATH_DEFINES
 #include "math.h"
 
-#define DEG2RAD(x) ((2. * M_PI * x) / 360.)
+#define DEG2RAD(x) ((M_PI * x) / 180.)
 ```
 
 ### Transformacije
