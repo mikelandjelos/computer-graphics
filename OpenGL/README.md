@@ -39,7 +39,7 @@ Back to [main page](../).
 
 ![gl_shade_model](./.assets/gl_shade_model.png)
 
-#### Polja temena
+#### Polja temena - optimizacija
 
 - ubrzava iscrtavanje;
 - postupak:
@@ -51,6 +51,16 @@ Back to [main page](../).
   3. Aktiviranje polja (`glEnableClientState()`);
   4. Crtanje geometrije (`glElementArray()`, `glDrawArrays()`, `glDrawElements()`, ...);
   5. Deaktiviranje polja (`glDisableClientState()`);
+
+### Mali dodatak - Osnovna geometrijska tela (matematicki modeli)
+
+- Cilindar;
+- Kupa;
+- Sfera;
+
+### Drugi termin - Pogled u 3D
+
+- postavljanje kamere, transformacije (centralna tema);
 
 ## References
 

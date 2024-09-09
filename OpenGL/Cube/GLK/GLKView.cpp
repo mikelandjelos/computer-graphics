@@ -30,6 +30,7 @@ BEGIN_MESSAGE_MAP(CGLKView, CView)
 	ON_WM_SIZE()
 	ON_WM_DESTROY()
 	ON_WM_ERASEBKGND()
+	ON_WM_KEYUP()
 END_MESSAGE_MAP()
 
 // CGLKView construction/destruction
@@ -137,7 +138,7 @@ void CGLKView::OnDestroy()
 
 	CDC* pDC = GetDC();
 	m_glRenderer.DestroyScene(pDC);
-	ReleaseDC(pDC);	
+	ReleaseDC(pDC);
 }
 
 
@@ -154,4 +155,46 @@ void CGLKView::OnInitialUpdate()
 	CDC* pDC = GetDC();
 	m_glRenderer.PrepareScene(pDC);
 	ReleaseDC(pDC);
+}
+
+
+void CGLKView::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+	switch (nChar)
+	{
+	case VK_UP:
+		m_glRenderer.ChangeView(0., +m_glRenderer.ANGLE_STEP, 0.), Invalidate();
+		break;
+	case VK_DOWN:
+		m_glRenderer.ChangeView(0., -m_glRenderer.ANGLE_STEP, 0.), Invalidate();
+		break;
+	case VK_LEFT:
+		m_glRenderer.ChangeView(0., 0., +m_glRenderer.ANGLE_STEP), Invalidate();
+		break;
+	case VK_RIGHT:
+		m_glRenderer.ChangeView(0., 0., -m_glRenderer.ANGLE_STEP), Invalidate();
+		break;
+	case VK_ADD:
+		m_glRenderer.ChangeView(-m_glRenderer.DISTANCE_STEP, 0., 0.), Invalidate();
+		break;
+	case VK_SUBTRACT:
+		m_glRenderer.ChangeView(+m_glRenderer.DISTANCE_STEP, 0., 0.), Invalidate();
+		break;
+	case 'A':
+		m_glRenderer.m_axesActive = !m_glRenderer.m_axesActive, Invalidate();
+		break;
+	case '1':
+		m_glRenderer.m_oGridXY = !m_glRenderer.m_oGridXY, Invalidate();
+		break;
+	case '2':
+		m_glRenderer.m_oGridXZ = !m_glRenderer.m_oGridXZ, Invalidate();
+		break;
+	case '3':
+		m_glRenderer.m_oGridYZ = !m_glRenderer.m_oGridYZ, Invalidate();
+		break;
+	default:
+		break;
+	}
+
+	CView::OnKeyUp(nChar, nRepCnt, nFlags);
 }
